@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>$kullz FF: Week 11 Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+/* A broadcast-style recap: scoreboard intro and ticker, final scores that count up, award cards that flip in,
+   a standings race to the playoff line, and the bubble. Everything animates as it scrolls into view. */
+:root{--bg:#0b0c17;--bg2:#141530;--surface:#1a1b33;--surface2:#232546;--fg:#f4f6fb;--muted:#9aa3b8;--line:#2c2e52;
+  --accent:#3ee38b;--accent2:#ffd23f;--win:#3ddc84;--loss:#ff6b72;
+  --display:"Bebas Neue","Arial Narrow",sans-serif;--cond:"Barlow Condensed","Arial Narrow",sans-serif;--body:"Barlow",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;color:var(--fg);font:16px/1.5 var(--body);
+  background:radial-gradient(120% 50% at 50% -5%,color-mix(in srgb,var(--accent) 20%,var(--bg2)),var(--bg) 60%) fixed}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.06;background:repeating-linear-gradient(0deg,var(--fg) 0 1px,transparent 1px 90px),repeating-linear-gradient(90deg,transparent 0 30%,var(--fg) 30% calc(30% + 1px),transparent calc(30% + 1px) 70%,var(--fg) 70% calc(70% + 1px),transparent calc(70% + 1px))}
+main{position:relative;max-width:760px;margin:0 auto;padding:16px 16px 64px}
+a{color:var(--accent)}
+.top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.tabs{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px}
+.tabs a{font:700 15px var(--cond);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:8px 16px;border-radius:999px;min-height:40px;display:inline-flex;align-items:center}
+.tabs a[aria-current="page"]{background:var(--accent);color:var(--bg)}
+.tabs a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button{font:700 14px var(--cond);letter-spacing:.06em;text-transform:uppercase;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:999px;min-height:40px;padding:0 16px;cursor:pointer}
+/* Intro */
+.intro{position:relative;margin:28px 0 8px;overflow:hidden}
+.intro .league{font:700 15px var(--cond);letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+.intro h1{margin:0;font:400 clamp(72px,19vw,150px)/.82 var(--display);letter-spacing:.01em}
+.intro h1 span{display:block}
+.intro h1 .wk{color:var(--accent2)}
+.intro .sub{font:400 clamp(28px,7vw,46px)/1 var(--display);letter-spacing:.04em;color:var(--fg);opacity:.9;margin-top:6px}
+.intro .bar{height:6px;margin-top:14px;background:linear-gradient(90deg,var(--accent),var(--accent2));transform-origin:left;border-radius:3px}
+.go .intro .league{animation:fadeUp .5s .1s both}
+.go .intro h1 .wk{animation:slamIn .6s .25s cubic-bezier(.2,1.5,.4,1) both}
+.go .intro h1 .ttl{animation:wipe .7s .6s cubic-bezier(.6,0,.2,1) both}
+.go .intro .sub{animation:fadeUp .5s 1s both}
+.go .intro .bar{animation:grow .9s 1.1s cubic-bezier(.6,0,.2,1) both}
+@keyframes slamIn{0%{opacity:0;transform:scale(2.6) rotate(-4deg)}70%{opacity:1;transform:scale(.95)}100%{transform:none}}
+@keyframes wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+/* Ticker */
+.ticker{margin:18px -16px 0;border-block:1px solid var(--line);background:color-mix(in srgb,var(--surface) 80%,transparent);overflow:hidden;white-space:nowrap}
+.ticker .run{display:inline-flex;gap:28px;padding:10px 0;animation:tick 40s linear infinite}
+.ticker span{font:700 15px var(--cond);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.ticker b{color:var(--fg);font-weight:700}.ticker .w{color:var(--accent)}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.lede{font-size:17px;margin:18px 0 0;max-width:62ch}
+/* Sections */
+section{margin-top:44px}
+h2{font:400 44px/1 var(--display);letter-spacing:.02em;margin:0 0 6px;display:flex;align-items:center;gap:12px}
+h2::after{content:"";flex:1;height:3px;background:linear-gradient(90deg,var(--accent),transparent);transform-origin:left;transform:scaleX(0);transition:transform .9s cubic-bezier(.6,0,.2,1)}
+.in h2::after,h2.in::after{transform:scaleX(1)}
+.note{color:var(--muted);font-size:15px;margin:10px 0 0;max-width:62ch}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+/* Matchups */
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-top:14px}
+.game{position:relative;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:16px;padding:14px 16px;overflow:hidden}
+.game .row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 12px;margin:4px 0}
+.game .tm{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.game .sc{font:400 30px/1 var(--display);letter-spacing:.03em;font-variant-numeric:tabular-nums;min-width:86px;text-align:right}
+.game .row.l .tm,.game .row.l .sc{color:var(--muted)}
+.game .meter{grid-column:1/-1;height:8px;border-radius:999px;background:color-mix(in srgb,var(--fg) 8%,transparent);overflow:hidden}
+.game .meter i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 50%,transparent),var(--accent));transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.game .row.l .meter i{background:color-mix(in srgb,var(--fg) 30%,transparent)}
+.game .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;margin-top:8px;font-size:13.5px;color:var(--muted)}
+.tag{font:700 13px var(--cond);letter-spacing:.08em;text-transform:uppercase;padding:2px 10px;border-radius:999px;border:1px solid currentColor;opacity:0;transform:scale(.6);transition:opacity .3s,transform .4s cubic-bezier(.2,1.6,.4,1)}
+.in .tag{opacity:1;transform:none;transition-delay:1.1s}
+.tag.blow{color:var(--loss)} .tag.bite{color:var(--accent2)} .tag.win{color:var(--accent)}
+.game .wc{display:inline-block;font:400 17px/1 var(--display);background:var(--accent);color:var(--bg);padding:3px 6px 1px;border-radius:5px;margin-right:8px;vertical-align:1px;transform:scale(0);transition:transform .4s 1.2s cubic-bezier(.2,1.6,.4,1)}
+.game.in .wc{transform:none}
+.game.bite.in{animation:shake .5s 1.3s}
+@keyframes shake{20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+/* Awards */
+.awards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px;perspective:1200px}
+.award{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;transform:rotateY(80deg);opacity:0;transition:transform .8s cubic-bezier(.2,.9,.3,1.2),opacity .4s;transform-origin:left}
+.award.in{transform:none;opacity:1}
+.award .big{font:400 46px/1 var(--display);color:var(--accent2);letter-spacing:.02em}
+.award h3{font:700 17px var(--cond);letter-spacing:.08em;text-transform:uppercase;margin:4px 0 6px;color:var(--accent)}
+.award p{margin:0;font-size:14.5px}
+.award svg{position:absolute;right:14px;top:14px;width:30px;height:30px;color:var(--accent2);opacity:.85}
+/* Standings */
+.table{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+.st{position:relative;display:grid;grid-template-columns:34px 1fr auto auto;align-items:center;gap:4px 12px;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);overflow:hidden;opacity:0;transform:translateX(-30px);transition:opacity .45s,transform .55s cubic-bezier(.2,.8,.2,1)}
+.st.in{opacity:1;transform:none}
+.st .seed{font:400 26px/1 var(--display);color:var(--muted);text-align:center}
+.st .tm b{display:block;font-weight:600;line-height:1.2}
+.st .tm small{color:var(--muted);font-size:12.5px}
+.st .rec{font:400 26px/1 var(--display);letter-spacing:.03em}
+.st .stk{font:700 13px var(--cond);letter-spacing:.06em;padding:2px 8px;border-radius:999px;min-width:42px;text-align:center}
+.st .stk.W{color:var(--bg);background:var(--win)} .st .stk.L{color:var(--loss);border:1px solid var(--loss)}
+.st .stk.hot{box-shadow:0 0 14px var(--accent2);background:var(--accent2)}
+.st .pf{grid-column:2/-1;height:6px;border-radius:999px;background:color-mix(in srgb,var(--fg) 7%,transparent);overflow:hidden}
+.st .pf i{display:block;height:100%;width:0;background:linear-gradient(90deg,transparent,var(--accent));transition:width 1.4s .2s cubic-bezier(.2,.8,.2,1)}
+.st .pfn{grid-column:2/-1;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.st.out{background:color-mix(in srgb,var(--surface) 60%,transparent)}
+.st.out .seed,.st.out .rec{opacity:.6}
+.cutline{position:relative;height:30px;margin:2px 0;display:flex;align-items:center;justify-content:center}
+.cutline::before{content:"";position:absolute;left:0;right:0;top:50%;height:3px;background:repeating-linear-gradient(90deg,var(--loss) 0 14px,transparent 14px 22px);transform:scaleX(0);transition:transform 1s .3s cubic-bezier(.6,0,.2,1)}
+.cutline span{position:relative;font:700 13px var(--cond);letter-spacing:.14em;text-transform:uppercase;color:var(--loss);background:var(--bg);padding:2px 12px;border-radius:999px;border:1px solid var(--loss);opacity:0;transition:opacity .4s 1.1s}
+.cutline.in::before{transform:scaleX(1)} .cutline.in span{opacity:1}
+/* Bubble */
+.bubble{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.bub{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.bub .nm{font-weight:600}.bub .nm small{color:var(--muted);font-weight:500;margin-left:6px}
+.bub .gap{font:700 14px var(--cond);letter-spacing:.04em;text-transform:uppercase;text-align:right}
+.bub .gap.up{color:var(--win)} .bub .gap.dn{color:var(--loss)}
+.bub .gauge{grid-column:1/-1;position:relative;height:10px;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--loss) 35%,transparent),color-mix(in srgb,var(--fg) 8%,transparent) 50%,color-mix(in srgb,var(--win) 35%,transparent))}
+.bub .gauge::after{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;background:var(--fg);opacity:.6}
+.bub .gauge i{position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--fg);box-shadow:0 0 0 3px var(--bg);left:50%;transition:left 1.2s .2s cubic-bezier(.2,1.2,.3,1)}
+.bub .opp{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.circle{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:12px}
+.vs{display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.vs .wk{font:400 22px/1 var(--display);color:var(--accent2);min-width:52px}
+.vs .t{font-size:14px;line-height:1.3}.vs .t em{font-style:normal;color:var(--muted);font:700 12px var(--cond);letter-spacing:.1em;display:block}
+.vs.in{animation:pop .45s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes pop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+@media (max-width:520px){.bub{grid-template-columns:1fr}.bub .gap{text-align:left}}
+@media (max-width:420px){.game .sc{font-size:26px;min-width:72px}h2{font-size:38px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal,.award,.st{opacity:1;transform:none}.ticker .run{animation:none}}
+
+.promo{margin:22px auto 0;max-width:420px;border-radius:22px;overflow:hidden;border:1px solid var(--line);box-shadow:0 20px 60px -20px color-mix(in srgb,var(--accent) 50%,transparent)}
+.promo video{display:block;width:100%;height:auto;background:#000}
+.gotw{position:relative;margin-top:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 18%,var(--surface)),var(--surface));border:2px solid color-mix(in srgb,var(--accent) 60%,var(--line));border-radius:20px;padding:18px}
+.gotw .lbl{font:700 14px var(--cond);letter-spacing:.18em;color:var(--loss);text-transform:uppercase}
+.mu{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.mu .t{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:baseline;margin:4px 0}
+.mu .t b{font-weight:600}.mu .t .pj{font:400 30px/1 var(--display);letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.mu .t small{grid-column:1/-1;color:var(--muted);font-size:13px}
+.wp{display:flex;height:12px;border-radius:999px;overflow:hidden;background:color-mix(in srgb,var(--fg) 8%,transparent);margin:10px 0 6px}
+.wp i{display:block;width:0;background:var(--accent);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.wp em{flex:1;background:#4da3ff;opacity:.85}
+.wpl{display:flex;justify-content:space-between;font:700 15px var(--cond);letter-spacing:.06em}
+.wpl .a{color:var(--accent)} .wpl .b{color:#4da3ff}
+.stk{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{font:700 13px var(--cond);letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.chip.big{color:var(--accent2);border-color:var(--accent2)}
+.alarm{position:relative;overflow:hidden;background:color-mix(in srgb,var(--loss) 12%,var(--surface));border:2px solid var(--loss);border-radius:16px;padding:14px 16px;margin-top:10px}
+.alarm::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 80% at 0% 0%,color-mix(in srgb,var(--loss) 40%,transparent),transparent 60%);animation:siren 1.2s ease-in-out infinite alternate}
+@keyframes siren{from{opacity:.2}to{opacity:.9}}
+.alarm>*{position:relative}
+.alarm h3{font:400 30px/1 var(--display);letter-spacing:.03em;margin:0 0 4px}
+.alarm ul{margin:6px 0 0;padding-left:18px}.alarm li{margin:2px 0}
+.alarm .fix{color:var(--accent2);font-weight:600}
+.oddrow{display:grid;grid-template-columns:minmax(0,1fr) 120px 60px;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.oddrow .bar{height:10px;border-radius:999px;background:color-mix(in srgb,var(--fg) 8%,transparent);overflow:hidden}
+.oddrow .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.oddrow b{font:400 26px var(--display);text-align:right}
+.oddrow small{color:var(--muted)}
+</style></head><body><main id="app" class="go">
+<header class="intro"><div class="league">$kullz FF · Preview</div><h1><span class="wk">Week 11</span><span class="ttl">Four to go</span></h1>
+<div class="sub">Win chances, playoff stakes &amp; lineup alarms</div><div class="bar"></div></header>
+<div class="promo"><video src="promo.mp4" poster="poster.jpg" controls playsinline preload="metadata"></video></div>
+<p class="lede reveal">Four regular-season weeks left, eight playoff spots, and this week decides a lot of them. Team Scott and No Pittman No Cry headline the slate, Joe Buck Your Self is starting three players on bye, and Deep Post vs. Hamlin's Defibrillator is a literal coin flip.</p>
+<section><h2 class="reveal">Game of the week</h2><div class="gotw reveal"><div class="lbl">Biggest playoff swing</div><div class="mu"><div class="t"><b>Team Scott</b><span class="pj" data-to="114.5">0.0</span><small>5-5 · playoff odds 64.5%</small></div>
+<div class="t"><b>No Pittman No Cry</b><span class="pj" data-to="120.1">0.0</span><small>7-3 · playoff odds 99.8%</small></div>
+<div class="wp"><i data-w="42"></i><em></em></div><div class="wpl"><span class="a">42%</span><span class="muted">win chance</span><span class="b">58%</span></div>
+<div class="stk"><span class="chip big">Team Scott: win 84% · lose 50%</span><span class="chip">No Pittman No Cry: 100% either way</span></div></div></div>
+<p class="note reveal">A Team Scott win is worth 34 points of playoff odds (84% vs 50%). No Pittman No Cry is in either way, but should start Aaron Rodgers over Matthew Stafford, who's on bye.</p></section>
+<section><h2 class="reveal">Lineup alarms</h2><p class="note reveal">Starters on bye or ruled out, and bench players projected well above a starter. Lineups as of Thursday morning.</p><div class="alarm reveal"><h3>Joe Buck Your Self</h3><div>Projected <b>59.9</b> as set · <span class="fix">88.9 with the best lineup (+29.0)</span></div><ul><li>Kyren Williams (RB) — on bye</li><li>Blake Corum (RB) — on bye</li><li>Michael Penix Jr. (QB) — on bye</li><li>Emeka Egbuka 10 on the bench, starting Blake Corum 0</li><li>Caleb Williams 19 on the bench, starting Michael Penix Jr. 0</li></ul></div><div class="alarm reveal"><h3>No Pittman No Cry</h3><div>Projected <b>106.3</b> as set · <span class="fix">122.1 with the best lineup (+15.8)</span></div><ul><li>Matthew Stafford (QB) — on bye</li><li>Aaron Rodgers 15.1 on the bench, starting Matthew Stafford 0</li></ul></div><div class="alarm reveal"><h3>Team DREAM</h3><div>Projected <b>76.6</b> as set · <span class="fix">77.7 with the best lineup (+1.1)</span></div><ul><li>Jason Myers (K) — on bye</li><li>Browns D/ST (DST) — on bye</li></ul></div><div class="alarm reveal"><h3>Rexx's Rowdy Team</h3><div>Projected <b>83.7</b> as set · <span class="fix">no healthy kicker on the roster to swap in</span></div><ul><li>Andre Szmyt (K) — on bye</li></ul></div><div class="alarm reveal"><h3>Team Scott</h3><div>Projected <b>103.8</b> as set · <span class="fix">116.1 with the best lineup (+12.3)</span></div><ul><li>D'Andre Swift 16.9 on the bench, starting Israel Abanikanda 4.6</li></ul></div></section>
+<section><h2 class="reveal">The full slate</h2><div class="games"><div class="mu reveal"><div class="t"><b>BAL So Hard</b><span class="pj" data-to="120.6">0.0</span><small>8-2 · playoff odds 100%</small></div>
+<div class="t"><b>Joe Buck Your Self</b><span class="pj" data-to="94.9">0.0</span><small>7-3 · playoff odds 70.5%</small></div>
+<div class="wp"><i data-w="78"></i><em></em></div><div class="wpl"><span class="a">78%</span><span class="muted">win chance</span><span class="b">22%</span></div>
+<div class="stk"><span class="chip">BAL So Hard: 100% either way</span><span class="chip big">Joe Buck Your Self: win 94% · lose 64%</span></div></div><div class="mu reveal"><div class="t"><b>Blue Collar Champions</b><span class="pj" data-to="110.8">0.0</span><small>3-7 · playoff odds 1.1%</small></div>
+<div class="t"><b>Rexx's Rowdy Team</b><span class="pj" data-to="80.3">0.0</span><small>1-9 · playoff odds 0%</small></div>
+<div class="wp"><i data-w="92"></i><em></em></div><div class="wpl"><span class="a">92%</span><span class="muted">win chance</span><span class="b">8%</span></div>
+<div class="stk"><span class="chip big">Blue Collar Champions: win 1% · lose 0%</span><span class="chip">Rexx's Rowdy Team: 0% either way</span></div></div><div class="mu reveal"><div class="t"><b>Team DREAM</b><span class="pj" data-to="79.5">0.0</span><small>2-8 · playoff odds 0%</small></div>
+<div class="t"><b>JD5ToTheSupy</b><span class="pj" data-to="121.7">0.0</span><small>5-5 · playoff odds 75.1%</small></div>
+<div class="wp"><i data-w="4"></i><em></em></div><div class="wpl"><span class="a">4%</span><span class="muted">win chance</span><span class="b">96%</span></div>
+<div class="stk"><span class="chip">Team DREAM: 0% either way</span><span class="chip big">JD5ToTheSupy: win 77% · lose 35%</span></div></div><div class="mu reveal"><div class="t"><b>Team Londrey</b><span class="pj" data-to="116.4">0.0</span><small>6-4 · playoff odds 97.8%</small></div>
+<div class="t"><b>Show Me Your Horne</b><span class="pj" data-to="102.1">0.0</span><small>4-6 · playoff odds 3.6%</small></div>
+<div class="wp"><i data-w="73"></i><em></em></div><div class="wpl"><span class="a">73%</span><span class="muted">win chance</span><span class="b">27%</span></div>
+<div class="stk"><span class="chip big">Team Londrey: win 100% · lose 93%</span><span class="chip big">Show Me Your Horne: win 11% · lose 1%</span></div></div><div class="mu reveal"><div class="t"><b>Stacking BILLS</b><span class="pj" data-to="102.1">0.0</span><small>5-5 · playoff odds 60%</small></div>
+<div class="t"><b>Who's Your Padre</b><span class="pj" data-to="111.5">0.0</span><small>9-1 · playoff odds 100%</small></div>
+<div class="wp"><i data-w="38"></i><em></em></div><div class="wpl"><span class="a">38%</span><span class="muted">win chance</span><span class="b">62%</span></div>
+<div class="stk"><span class="chip big">Stacking BILLS: win 81% · lose 47%</span><span class="chip">Who's Your Padre: 100% either way</span></div></div><div class="mu reveal"><div class="t"><b>Bippity bop Give me the zop</b><span class="pj" data-to="112.7">0.0</span><small>4-6 · playoff odds 5.1%</small></div>
+<div class="t"><b>Team really really bad guys</b><span class="pj" data-to="103.7">0.0</span><small>2-8 · playoff odds 0%</small></div>
+<div class="wp"><i data-w="61"></i><em></em></div><div class="wpl"><span class="a">61%</span><span class="muted">win chance</span><span class="b">39%</span></div>
+<div class="stk"><span class="chip big">Bippity bop Give me the zop: win 8% · lose 1%</span><span class="chip">Team really really bad guys: 0% either way</span></div></div><div class="mu reveal"><div class="t"><b>Deep Post</b><span class="pj" data-to="107.8">0.0</span><small>5-5 · playoff odds 23.3%</small></div>
+<div class="t"><b>Hamlin's Defibrillator</b><span class="pj" data-to="107.7">0.0</span><small>7-3 · playoff odds 99.2%</small></div>
+<div class="wp"><i data-w="50"></i><em></em></div><div class="wpl"><span class="a">50%</span><span class="muted">win chance</span><span class="b">50%</span></div>
+<div class="stk"><span class="chip big">Deep Post: win 36% · lose 10%</span><span class="chip big">Hamlin's Defibrillator: win 100% · lose 98%</span></div></div></div>
+<p class="note reveal">Win chances use ESPN's player projections for each team's best available lineup, blended with its season scoring average, and how much each team's score swings week to week. The chips show each team's playoff odds if it wins or loses this week.</p></section>
+<section><h2 class="reveal">Playoff odds</h2><p class="note reveal">20,000 simulations of Weeks 11 to 14. Eight teams make it; ties go to total points.</p><div class="table"><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Who's Your Padre</b><br><small>9-1 · 1,287.02 pts</small></span><span class="bar"><i data-w="100"></i></span><b>100%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">BAL So Hard</b><br><small>8-2 · 1,273.52 pts</small></span><span class="bar"><i data-w="100"></i></span><b>100%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">No Pittman No Cry</b><br><small>7-3 · 1,170.82 pts</small></span><span class="bar"><i data-w="99.8"></i></span><b>99.8%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Hamlin's Defibrillator</b><br><small>7-3 · 1,180.88 pts</small></span><span class="bar"><i data-w="99.2"></i></span><b>99.2%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Team Londrey</b><br><small>6-4 · 1,130.16 pts</small></span><span class="bar"><i data-w="97.8"></i></span><b>97.8%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">JD5ToTheSupy</b><br><small>5-5 · 1,176.04 pts</small></span><span class="bar"><i data-w="75.1"></i></span><b>75.1%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Joe Buck Your Self</b><br><small>7-3 · 1,038.76 pts</small></span><span class="bar"><i data-w="70.5"></i></span><b>70.5%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Team Scott</b><br><small>5-5 · 1,119.88 pts</small></span><span class="bar"><i data-w="64.5"></i></span><b>64.5%</b></div><div class="cutline reveal"><span>Playoff line</span></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Stacking BILLS</b><br><small>5-5 · 1,154.58 pts</small></span><span class="bar"><i data-w="60"></i></span><b>60%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Deep Post</b><br><small>5-5 · 1,045.00 pts</small></span><span class="bar"><i data-w="23.3"></i></span><b>23.3%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Bippity bop Give me the zop</b><br><small>4-6 · 1,039.84 pts</small></span><span class="bar"><i data-w="5.1"></i></span><b>5.1%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Show Me Your Horne</b><br><small>4-6 · 1,060.34 pts</small></span><span class="bar"><i data-w="3.6"></i></span><b>3.6%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Blue Collar Champions</b><br><small>3-7 · 1,045.70 pts</small></span><span class="bar"><i data-w="1.1"></i></span><b>1.1%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Team DREAM</b><br><small>2-8 · 820.78 pts</small></span><span class="bar"><i data-w="0"></i></span><b>0%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Team really really bad guys</b><br><small>2-8 · 944.70 pts</small></span><span class="bar"><i data-w="0"></i></span><b>0%</b></div><div class="oddrow reveal"><span><b style="font:600 15px var(--body)">Rexx's Rowdy Team</b><br><small>1-9 · 752.86 pts</small></span><span class="bar"><i data-w="0"></i></span><b>0%</b></div></div></section>
+<footer>Projections and rosters from ESPN, Thursday Nov 19. Odds are simulations, not guarantees; Sunday lineup changes will move them.</footer>
+</main><script>
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt=v=>Number(v).toFixed(1);
+function countUp(el,to){if(RM){el.textContent=fmt(to);return}const t0=performance.now();const s=t=>{const k=Math.min(1,(t-t0)/1200),e=1-Math.pow(1-k,3);el.textContent=fmt(to*e);if(k<1)requestAnimationFrame(s)};requestAnimationFrame(s)}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target;io.unobserve(el);el.classList.add('in');
+el.querySelectorAll('.pj[data-to]').forEach(s=>countUp(s,+s.dataset.to));el.querySelectorAll('i[data-w]').forEach(i=>requestAnimationFrame(()=>i.style.width=i.dataset.w+'%'))}),{threshold:.2});
+document.querySelectorAll('.reveal,.cutline,h2,.gotw').forEach((el,i)=>{el.style.transitionDelay=(i%6)*60+'ms';io.observe(el)});
+</script></body></html>
