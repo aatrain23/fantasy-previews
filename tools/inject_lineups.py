@@ -61,6 +61,7 @@ css = """
 .lu-f{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;font:700 11px/1.5 var(--cond);letter-spacing:.04em;
   background:color-mix(in srgb,var(--loss) 22%,transparent);color:var(--loss)}
 .lu-f.q{background:color-mix(in srgb,var(--accent2) 22%,transparent);color:var(--accent2)}
+.lu-act{color:var(--accent2);font-weight:700}
 .lu-so{margin:0 0 6px;font-size:13px;color:var(--muted)}.lu-so b{color:var(--fg);font-size:15px}
 .lu-note{margin:10px 0 0;color:var(--muted);font-size:12px}
 """
@@ -73,8 +74,9 @@ const norm=s=>s.replace(/\s+/g,' ').trim();
 const fl={BYE:'BYE',O:'OUT',IR:'IR',D:'DOUBTFUL',Q:'Q'};
 function row(r,bench){
   const f=r.f?`<span class="lu-f${r.f==='Q'?' q':''}">${fl[r.f]}</span>`:'';
-  const pr=r.pr==null?'–':Number(r.pr).toFixed(1);
-  const sc=r.a!=null?`<small>scored ${Number(r.a).toFixed(1)}</small>`:'';
+  const pj=r.pr==null?'–':Number(r.pr).toFixed(1);
+  const pr=r.a!=null?`<b class="lu-act">${Number(r.a).toFixed(1)}</b>`:pj;
+  const sc=r.a!=null?`<small>proj ${pj}</small>`:'';
   return `<div class="lu-row${bench?' bench':''}"><span class="sl">${esc(r.s)}</span><span class="nm">${esc(r.n)}<small>${esc(r.p)} · ${esc(r.t)}</small>${f}</span><span class="pt">${pr}${sc}</span></div>`;
 }
 function team(name){
@@ -92,7 +94,7 @@ document.querySelectorAll('.mu').forEach((mu,i)=>{
   btn.className='lu-btn';btn.type='button';btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-controls',id);
   btn.innerHTML='Lineups <span class="ar" aria-hidden="true">▾</span>';
   const panel=document.createElement('div');panel.className='lu';panel.id=id;
-  panel.innerHTML=`<div><div class="lu-cols">${team(names[0])}${team(names[1])}</div><p class="lu-note">ESPN projections per player. ${esc(D.label)}</p></div>`;
+  panel.innerHTML=`<div><div class="lu-cols">${team(names[0])}${team(names[1])}</div><p class="lu-note">Gold numbers are points scored (live while a game is on); white numbers are ESPN projections for players who haven't played yet. ${esc(D.label)}</p></div>`;
   mu.append(btn,panel);
   const toggle=()=>{const o=mu.classList.toggle('lu-open');btn.setAttribute('aria-expanded',o)};
   btn.addEventListener('click',e=>{e.stopPropagation();toggle()});
