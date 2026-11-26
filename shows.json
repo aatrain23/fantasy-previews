@@ -2,5 +2,7 @@
   {"league": "$kullz FF", "week": 11, "path": "kullz/week-11/", "theme": "fall"},
   {"league": "Boy Men Feet Balls", "week": 11, "path": "bmfb/week-11/", "theme": "fall"},
   {"league": "$kullz FF", "week": 11, "path": "kullz/week-11-recap/", "theme": "recap"},
-  {"league": "Boy Men Feet Balls", "week": 11, "path": "bmfb/week-11-recap/", "theme": "recap"}
+  {"league": "Boy Men Feet Balls", "week": 11, "path": "bmfb/week-11-recap/", "theme": "recap"},
+  {"league": "$kullz FF", "week": 12, "path": "kullz/week-12/", "theme": "Thanksgiving"},
+  {"league": "Boy Men Feet Balls", "week": 12, "path": "bmfb/week-12/", "theme": "Thanksgiving"}
 ]
